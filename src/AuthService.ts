@@ -51,16 +51,18 @@ export class AuthService<TIDToken = JWTIDToken> {
     this.props = props
     const code = this.getCodeFromLocation(window.location)
     if (code !== null) {
-      this.fetchToken(code)
+      try {
+        this.getPkce() // check if pkce exists before fetching token
+        this.fetchToken(code)
         .then(() => {
           this.restoreUri()
         })
-        .catch((e) => {
-          this.removeItem('pkce')
+      } catch (e) {
+        this.removeItem('pkce')
           this.removeItem('auth')
           this.removeCodeFromLocation()
           console.warn({ e })
-        })
+      }
     } else if (this.props.autoRefresh) {
       this.startTimer()
     }

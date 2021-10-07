@@ -122,19 +122,19 @@ var AuthService = /*#__PURE__*/function () {
     var code = this.getCodeFromLocation(window.location);
 
     if (code !== null) {
-      this.fetchToken(code).then(function () {
-        _this.restoreUri();
-      })["catch"](function (e) {
-        _this.removeItem('pkce');
-
-        _this.removeItem('auth');
-
-        _this.removeCodeFromLocation();
-
+      try {
+        this.getPkce();
+        this.fetchToken(code).then(function () {
+          _this.restoreUri();
+        });
+      } catch (e) {
+        this.removeItem('pkce');
+        this.removeItem('auth');
+        this.removeCodeFromLocation();
         console.warn({
           e: e
         });
-      });
+      }
     } else if (this.props.autoRefresh) {
       this.startTimer();
     }
